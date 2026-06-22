@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Password Generator – Free Tool</title>
+  <title>Password Manager – Generate & Save</title>
   <style>
     /* ---------- RESET & BASE ---------- */
     * {
@@ -48,7 +48,6 @@
       pointer-events: none;
     }
 
-    /* Floating particles */
     .orb {
       position: absolute;
       border-radius: 50%;
@@ -141,7 +140,7 @@
 
     /* ---------- MAIN CONTAINER ---------- */
     .container {
-      max-width: 540px;
+      max-width: 660px;
       width: 100%;
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(20px);
@@ -184,15 +183,22 @@
 
     .subhead {
       color: rgba(255, 255, 255, 0.6);
-      margin-bottom: 2rem;
+      margin-bottom: 1.8rem;
       font-size: 0.95rem;
+    }
+
+    /* ---- Generator Section ---- */
+    .generator-section {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 1.8rem;
+      margin-bottom: 1.8rem;
     }
 
     .password-display {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 16px;
-      padding: 1rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -209,7 +215,7 @@
 
     #passwordOutput {
       font-family: 'Menlo', 'Cascadia Code', monospace;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       letter-spacing: 0.02em;
       color: #e2e8f0;
       flex: 1;
@@ -219,17 +225,18 @@
     .copy-btn {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
-      padding: 0.4rem 0.9rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 40px;
       transition: all 0.2s;
       color: #c4b5fd;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.3rem;
       font-weight: 500;
       backdrop-filter: blur(4px);
+      white-space: nowrap;
     }
 
     .copy-btn:hover {
@@ -245,12 +252,11 @@
       color: #34d399;
     }
 
-    /* ---------- OPTIONS / TOGGLES ---------- */
     .options {
       display: flex;
       flex-direction: column;
-      gap: 1.2rem;
-      margin: 1.8rem 0 2rem;
+      gap: 1rem;
+      margin: 1.5rem 0 1.2rem;
     }
 
     .option-row {
@@ -267,7 +273,6 @@
       font-size: 0.95rem;
     }
 
-    /* Custom Range Slider */
     .option-row input[type="range"] {
       width: 160px;
       height: 4px;
@@ -276,7 +281,6 @@
       background: linear-gradient(to right, #818cf8, #34d399);
       border-radius: 99px;
       outline: none;
-      transition: opacity 0.2s;
     }
     .option-row input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -310,7 +314,6 @@
       font-size: 1.1rem;
     }
 
-    /* Custom Toggle Switch (replaces checkboxes) */
     .switch {
       position: relative;
       display: inline-block;
@@ -359,12 +362,11 @@
       box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
     }
 
-    /* ---------- STRENGTH ---------- */
     .strength-section {
       display: flex;
       align-items: center;
       gap: 1rem;
-      margin: 0.5rem 0 1.8rem;
+      margin: 0.5rem 0 1.2rem;
     }
     .strength-section > span:first-child {
       font-weight: 500;
@@ -384,9 +386,7 @@
       height: 100%;
       width: 0%;
       border-radius: 99px;
-      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-        background 0.3s;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
     }
 
     .strength-label {
@@ -397,10 +397,9 @@
       color: rgba(255, 255, 255, 0.8);
     }
 
-    /* ---------- GENERATE BUTTON ---------- */
     .generate-btn {
       width: 100%;
-      padding: 0.9rem;
+      padding: 0.8rem;
       border: none;
       border-radius: 40px;
       font-size: 1.1rem;
@@ -418,7 +417,6 @@
       transform: scale(1.02) translateY(-2px);
       box-shadow: 0 12px 32px -6px rgba(129, 140, 248, 0.5);
     }
-
     .generate-btn:active {
       transform: scale(0.97);
     }
@@ -435,10 +433,191 @@
       }
     }
 
-    /* ---------- FOOTER (Built for Digital Heroes) ---------- */
-    .built-for {
+    /* ---- Save Section ---- */
+    .save-section {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 1.2rem 1.2rem 1rem;
+      margin-bottom: 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .save-section .save-title {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .save-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .save-row input {
+      flex: 1 1 140px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 40px;
+      padding: 0.6rem 1rem;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .save-row input:focus {
+      border-color: #818cf8;
+    }
+
+    .save-row input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, #34d399, #22c55e);
+      border: none;
+      border-radius: 40px;
+      padding: 0.6rem 1.4rem;
+      font-weight: 600;
+      color: #0b091a;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .save-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px -4px rgba(52, 211, 153, 0.4);
+    }
+
+    .save-msg {
+      font-size: 0.85rem;
+      color: #34d399;
+      margin-top: 0.5rem;
+      min-height: 1.4rem;
+    }
+
+    /* ---- Saved Passwords List ---- */
+    .saved-list {
+      margin-top: 0.5rem;
+    }
+
+    .saved-list .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .saved-list .list-header h3 {
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .saved-list .list-header button {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      padding: 0.25rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .saved-list .list-header button:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .saved-item {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.15s;
+      gap: 0.3rem 0.6rem;
+    }
+
+    .saved-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .saved-item .site {
+      color: #e2e8f0;
+      font-weight: 500;
+      min-width: 70px;
+    }
+
+    .saved-item .username {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      min-width: 60px;
+    }
+
+    .saved-item .pass {
+      font-family: 'Menlo', monospace;
+      font-size: 0.9rem;
+      color: #c4b5fd;
+      flex: 1 1 120px;
+      word-break: break-all;
+    }
+
+    .saved-item .actions {
+      display: flex;
+      gap: 0.3rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .saved-item .actions button {
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      border-radius: 30px;
+      padding: 0.2rem 0.6rem;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .saved-item .actions button:hover {
+      background: rgba(167, 139, 250, 0.15);
+      color: #fff;
+    }
+
+    .saved-item .actions .del-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .empty-msg {
+      color: rgba(255, 255, 255, 0.3);
       text-align: center;
-      margin-top: 2.5rem;
+      padding: 1.5rem 0;
+      font-style: italic;
+    }
+
+    /* ---------- FOOTER ---------- */
+    .built-for {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      text-align: center;
+      margin-top: 2rem;
       padding-top: 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
@@ -464,6 +643,12 @@
       transform: translateY(-2px);
     }
 
+    .built-for .separator {
+      color: rgba(255, 255, 255, 0.15);
+      font-weight: 300;
+      font-size: 1.2rem;
+    }
+
     .contact {
       margin-top: 1.2rem;
       font-size: 0.9rem;
@@ -481,8 +666,7 @@
       border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    /* ---------- RESPONSIVE ---------- */
-    @media (max-width: 480px) {
+    @media (max-width: 550px) {
       .container {
         padding: 1.8rem 1.2rem;
       }
@@ -506,11 +690,35 @@
         width: 120px;
         height: 120px;
       }
+      .built-for {
+        gap: 0.4rem;
+      }
+      .built-for a {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+      }
+      .save-row input {
+        flex: 1 1 100%;
+      }
+      .saved-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.2rem;
+      }
+      .saved-item .site,
+      .saved-item .username,
+      .saved-item .pass {
+        min-width: 0;
+      }
+      .saved-item .actions {
+        margin-left: 0;
+        justify-content: flex-end;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- INTRO OVERLAY with floating orbs -->
+  <!-- INTRO OVERLAY -->
   <div id="introOverlay">
     <div class="orb orb1"></div>
     <div class="orb orb2"></div>
@@ -529,71 +737,97 @@
 
   <!-- MAIN TOOL -->
   <div class="container" id="mainContainer">
-    <h1>🔐 Password Generator</h1>
-    <p class="subhead">Strong, customisable passwords – instantly.</p>
+    <h1>🔐 Password Manager</h1>
+    <p class="subhead">Generate, save & manage usernames & passwords for all your accounts.</p>
 
-    <div class="password-display">
-      <span id="passwordOutput">Click generate</span>
-      <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
-        <span>📋</span> Copy
-      </button>
-    </div>
+    <!-- Generator Section -->
+    <div class="generator-section">
+      <div class="password-display">
+        <span id="passwordOutput">Click generate</span>
+        <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
+          <span>📋</span> Copy
+        </button>
+      </div>
 
-    <div class="options">
-      <div class="option-row">
-        <label for="lengthSlider">Length</label>
-        <div style="display:flex; align-items:center; gap:0.8rem;">
-          <input type="range" id="lengthSlider" min="6" max="40" value="16" />
-          <span class="length-value" id="lengthDisplay">16</span>
+      <div class="options">
+        <div class="option-row">
+          <label for="lengthSlider">Length</label>
+          <div style="display:flex; align-items:center; gap:0.8rem;">
+            <input type="range" id="lengthSlider" min="6" max="40" value="16" />
+            <span class="length-value" id="lengthDisplay">16</span>
+          </div>
+        </div>
+        <div class="option-row">
+          <label>A–Z</label>
+          <label class="switch">
+            <input type="checkbox" id="includeUppercase" checked />
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="option-row">
+          <label>0–9</label>
+          <label class="switch">
+            <input type="checkbox" id="includeNumbers" checked />
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="option-row">
+          <label>!@#$%^&amp;*</label>
+          <label class="switch">
+            <input type="checkbox" id="includeSymbols" checked />
+            <span class="slider-toggle"></span>
+          </label>
         </div>
       </div>
-      <div class="option-row">
-        <label>A–Z</label>
-        <label class="switch">
-          <input type="checkbox" id="includeUppercase" checked />
-          <span class="slider-toggle"></span>
-        </label>
+
+      <div class="strength-section">
+        <span>Strength</span>
+        <div class="strength-bar">
+          <div class="strength-fill" id="strengthFill"></div>
+        </div>
+        <span class="strength-label" id="strengthLabel">—</span>
       </div>
-      <div class="option-row">
-        <label>0–9</label>
-        <label class="switch">
-          <input type="checkbox" id="includeNumbers" checked />
-          <span class="slider-toggle"></span>
-        </label>
+
+      <button class="generate-btn" id="generateBtn">⚡ Generate New Password</button>
+    </div>
+
+    <!-- Save Section -->
+    <div class="save-section">
+      <div class="save-title">💾 Save for a service</div>
+      <div class="save-row">
+        <input type="text" id="serviceInput" placeholder="Service (e.g. Instagram)" />
+        <input type="text" id="usernameInput" placeholder="Username / email" />
+        <button class="save-btn" id="saveBtn">Save</button>
       </div>
-      <div class="option-row">
-        <label>!@#$%^&amp;*</label>
-        <label class="switch">
-          <input type="checkbox" id="includeSymbols" checked />
-          <span class="slider-toggle"></span>
-        </label>
+      <div id="saveMessage" class="save-msg"></div>
+    </div>
+
+    <!-- Saved List -->
+    <div class="saved-list">
+      <div class="list-header">
+        <h3>📂 Saved Accounts</h3>
+        <button id="clearAllBtn">Clear All</button>
+      </div>
+      <div id="savedContainer">
+        <!-- dynamically rendered -->
       </div>
     </div>
 
-    <div class="strength-section">
-      <span>Strength</span>
-      <div class="strength-bar">
-        <div class="strength-fill" id="strengthFill"></div>
-      </div>
-      <span class="strength-label" id="strengthLabel">—</span>
-    </div>
-
-    <button class="generate-btn" id="generateBtn">⚡ Generate New Password</button>
-
-    <!-- Mandatory "Built for Digital Heroes" button -->
+    <!-- Footer -->
     <div class="built-for">
       <a href="https://digitalheroesco.com" target="_blank">Built for Digital Heroes</a>
+      <span class="separator">·</span>
+      <a href="https://www.linkedin.com/in/yogeshpandey2028" target="_blank">🔗 Connect on LinkedIn</a>
     </div>
 
-    <!-- Your name and email – REPLACE WITH YOUR OWN -->
     <div class="contact">
-      <span>👤 Yogesh pandey</span>
+      <span>👤 Yogesh Pandey</span>
       <span>✉️ ap0383683@gmail.com</span>
     </div>
   </div>
 
   <script>
-    // ---------- INTRO ANIMATION ----------
+    // ---------- INTRO ----------
     const overlay = document.getElementById('introOverlay');
     const slide1 = document.getElementById('slide1');
     const slide2 = document.getElementById('slide2');
@@ -612,7 +846,7 @@
       }, 900);
     }, 3000);
 
-    // ---------- PASSWORD GENERATOR LOGIC ----------
+    // ---------- PASSWORD GENERATOR ----------
     const passwordOutput = document.getElementById('passwordOutput');
     const lengthSlider = document.getElementById('lengthSlider');
     const lengthDisplay = document.getElementById('lengthDisplay');
@@ -740,7 +974,148 @@
       }
     });
 
-    // Initial generation after intro
+    // ---------- SAVE & STORAGE ----------
+    const serviceInput = document.getElementById('serviceInput');
+    const usernameInput = document.getElementById('usernameInput');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveMessage = document.getElementById('saveMessage');
+    const savedContainer = document.getElementById('savedContainer');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    let savedPasswords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+
+    function renderSaved() {
+      if (savedPasswords.length === 0) {
+        savedContainer.innerHTML = `<div class="empty-msg">No accounts saved yet.</div>`;
+        return;
+      }
+      let html = '';
+      savedPasswords.forEach((item, index) => {
+        html += `
+          <div class="saved-item">
+            <span class="site">${escapeHtml(item.site)}</span>
+            <span class="username">${escapeHtml(item.username || '')}</span>
+            <span class="pass">${escapeHtml(item.password)}</span>
+            <div class="actions">
+              <button class="copy-username" data-index="${index}" title="Copy username">👤</button>
+              <button class="copy-pass" data-index="${index}" title="Copy password">🔑</button>
+              <button class="del-btn" data-index="${index}" title="Delete">✕</button>
+            </div>
+          </div>
+        `;
+      });
+      savedContainer.innerHTML = html;
+
+      // Copy username
+      document.querySelectorAll('.copy-username').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          const username = savedPasswords[idx].username || '';
+          if (!username) return;
+          navigator.clipboard.writeText(username).then(() => {
+            e.target.textContent = '✅';
+            setTimeout(() => { e.target.textContent = '👤'; }, 1500);
+          }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = username;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            e.target.textContent = '✅';
+            setTimeout(() => { e.target.textContent = '👤'; }, 1500);
+          });
+        });
+      });
+
+      // Copy password
+      document.querySelectorAll('.copy-pass').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          const pass = savedPasswords[idx].password;
+          navigator.clipboard.writeText(pass).then(() => {
+            e.target.textContent = '✅';
+            setTimeout(() => { e.target.textContent = '🔑'; }, 1500);
+          }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = pass;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            e.target.textContent = '✅';
+            setTimeout(() => { e.target.textContent = '🔑'; }, 1500);
+          });
+        });
+      });
+
+      // Delete
+      document.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.dataset.index);
+          savedPasswords.splice(idx, 1);
+          localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+          renderSaved();
+        });
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function savePassword() {
+      const site = serviceInput.value.trim();
+      const username = usernameInput.value.trim();
+      const password = passwordOutput.textContent;
+      if (!site) {
+        saveMessage.textContent = '⚠️ Please enter a service name.';
+        saveMessage.style.color = '#fbbf24';
+        return;
+      }
+      if (!password || password === 'Click generate' || password === 'Select at least one type') {
+        saveMessage.textContent = '⚠️ Generate a password first.';
+        saveMessage.style.color = '#fbbf24';
+        return;
+      }
+      // Check if service already exists, update if yes
+      const existing = savedPasswords.findIndex(p => p.site.toLowerCase() === site.toLowerCase());
+      if (existing !== -1) {
+        savedPasswords[existing].username = username;
+        savedPasswords[existing].password = password;
+      } else {
+        savedPasswords.push({ site, username, password });
+      }
+      localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+      renderSaved();
+      saveMessage.textContent = '✅ Saved successfully!';
+      saveMessage.style.color = '#34d399';
+      serviceInput.value = '';
+      usernameInput.value = '';
+      setTimeout(() => {
+        saveMessage.textContent = '';
+      }, 3000);
+    }
+
+    saveBtn.addEventListener('click', savePassword);
+
+    // Press Enter on any input to save
+    serviceInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') savePassword(); });
+    usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') savePassword(); });
+
+    clearAllBtn.addEventListener('click', () => {
+      if (confirm('Delete all saved accounts?')) {
+        savedPasswords = [];
+        localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+        renderSaved();
+      }
+    });
+
+    renderSaved();
+
+    // initial password after intro
     setTimeout(() => {
       refreshPassword();
     }, 3200);
