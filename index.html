@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Password Manager – Generate & Save</title>
+  <title>Encrypted Password Manager</title>
   <style>
     /* ---------- RESET & BASE ---------- */
     * {
@@ -185,6 +185,99 @@
       color: rgba(255, 255, 255, 0.6);
       margin-bottom: 1.8rem;
       font-size: 0.95rem;
+    }
+
+    /* ---- Lock / Unlock Overlay ---- */
+    #lockOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(11, 9, 26, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 1.5rem;
+      transition: opacity 0.5s ease;
+    }
+
+    #lockOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .lock-box {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2.5rem 2rem;
+      border-radius: 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+    }
+
+    .lock-box .lock-icon {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .lock-box h2 {
+      color: #e2e8f0;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .lock-box p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    .lock-box input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 40px;
+      padding: 0.8rem 1.2rem;
+      color: #e2e8f0;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+      margin-bottom: 1rem;
+    }
+    .lock-box input:focus {
+      border-color: #818cf8;
+    }
+    .lock-box input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    .lock-box .lock-btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: linear-gradient(135deg, #818cf8, #a78bfa, #34d399);
+      background-size: 200% 200%;
+      color: #0b091a;
+      animation: gradientShift 4s ease-in-out infinite;
+      box-shadow: 0 8px 24px -6px rgba(129, 140, 248, 0.3);
+    }
+    .lock-box .lock-btn:hover {
+      transform: scale(1.02) translateY(-2px);
+      box-shadow: 0 12px 32px -6px rgba(129, 140, 248, 0.5);
+    }
+    .lock-box .lock-error {
+      color: #f87171;
+      font-size: 0.9rem;
+      min-height: 1.5rem;
+      margin-top: 0.5rem;
     }
 
     /* ---- Generator Section ---- */
@@ -521,10 +614,15 @@
       font-size: 1rem;
     }
 
-    .saved-list .list-header button {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: #f87171;
+    .saved-list .list-header .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .saved-list .list-header .header-actions button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.6);
       padding: 0.25rem 0.8rem;
       border-radius: 40px;
       font-size: 0.8rem;
@@ -532,8 +630,16 @@
       transition: all 0.2s;
     }
 
-    .saved-list .list-header button:hover {
-      background: rgba(239, 68, 68, 0.25);
+    .saved-list .list-header .header-actions .clear-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    .saved-list .list-header .header-actions .lock-btn:hover {
+      background: rgba(167, 139, 250, 0.15);
+      border-color: #a78bfa;
+      color: #fff;
     }
 
     .saved-item {
@@ -714,6 +820,9 @@
         margin-left: 0;
         justify-content: flex-end;
       }
+      .lock-box {
+        padding: 1.8rem 1.2rem;
+      }
     }
   </style>
 </head>
@@ -735,10 +844,22 @@
     </div>
   </div>
 
+  <!-- LOCK / UNLOCK OVERLAY -->
+  <div id="lockOverlay">
+    <div class="lock-box">
+      <div class="lock-icon">🔒</div>
+      <h2 id="lockTitle">Enter Master Password</h2>
+      <p id="lockSubtitle">Your vault is encrypted. Enter the password to unlock.</p>
+      <input type="password" id="masterPasswordInput" placeholder="Enter your master password" />
+      <button class="lock-btn" id="unlockBtn">Unlock Vault</button>
+      <div class="lock-error" id="lockError"></div>
+    </div>
+  </div>
+
   <!-- MAIN TOOL -->
   <div class="container" id="mainContainer">
-    <h1>🔐 Password Manager</h1>
-    <p class="subhead">Generate, save & manage usernames & passwords for all your accounts.</p>
+    <h1>🔐 Encrypted Password Manager</h1>
+    <p class="subhead">Generate, save & manage usernames & passwords – fully encrypted.</p>
 
     <!-- Generator Section -->
     <div class="generator-section">
@@ -806,7 +927,10 @@
     <div class="saved-list">
       <div class="list-header">
         <h3>📂 Saved Accounts</h3>
-        <button id="clearAllBtn">Clear All</button>
+        <div class="header-actions">
+          <button class="lock-btn-header" id="lockVaultBtn">🔒 Lock</button>
+          <button class="clear-btn" id="clearAllBtn">Clear All</button>
+        </div>
       </div>
       <div id="savedContainer">
         <!-- dynamically rendered -->
@@ -822,7 +946,7 @@
 
     <div class="contact">
       <span>👤 Yogesh Pandey</span>
-      <span>✉️ ap0383683@gmail.com</span>
+      <span>✉️ your.email@example.com</span>
     </div>
   </div>
 
@@ -840,11 +964,182 @@
 
     setTimeout(() => {
       overlay.classList.add('hidden');
-      mainContainer.classList.add('visible');
+      // mainContainer will be shown after unlock
       setTimeout(() => {
         overlay.style.display = 'none';
       }, 900);
     }, 3000);
+
+    // ---------- ENCRYPTION / DECRYPTION ----------
+    const lockOverlay = document.getElementById('lockOverlay');
+    const masterPasswordInput = document.getElementById('masterPasswordInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const lockError = document.getElementById('lockError');
+    const lockTitle = document.getElementById('lockTitle');
+    const lockSubtitle = document.getElementById('lockSubtitle');
+    const lockVaultBtn = document.getElementById('lockVaultBtn');
+
+    let currentKey = null; // holds the crypto key after unlock
+    let vaultData = []; // decrypted array
+
+    // Helper: generate salt and IV
+    function generateSalt() {
+      return crypto.getRandomValues(new Uint8Array(16));
+    }
+
+    function generateIV() {
+      return crypto.getRandomValues(new Uint8Array(12));
+    }
+
+    // Derive a key from master password using PBKDF2
+    async function deriveKey(masterPassword, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(masterPassword),
+        'PBKDF2',
+        false,
+        ['deriveKey']
+      );
+      return crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        {
+          name: 'AES-GCM',
+          length: 256
+        },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+
+    // Encrypt data
+    async function encryptData(data, key) {
+      const enc = new TextEncoder();
+      const iv = generateIV();
+      const encrypted = await crypto.subtle.encrypt(
+        {
+          name: 'AES-GCM',
+          iv: iv
+        },
+        key,
+        enc.encode(JSON.stringify(data))
+      );
+      return {
+        iv: Array.from(iv),
+        data: Array.from(new Uint8Array(encrypted))
+      };
+    }
+
+    // Decrypt data
+    async function decryptData(encryptedObj, key) {
+      const iv = new Uint8Array(encryptedObj.iv);
+      const data = new Uint8Array(encryptedObj.data);
+      const decrypted = await crypto.subtle.decrypt(
+        {
+          name: 'AES-GCM',
+          iv: iv
+        },
+        key,
+        data
+      );
+      const dec = new TextDecoder();
+      return JSON.parse(dec.decode(decrypted));
+    }
+
+    // ---------- STORAGE HELPERS ----------
+    function getStoredVault() {
+      const raw = localStorage.getItem('encryptedVault');
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function storeVault(salt, encryptedObj) {
+      localStorage.setItem('encryptedVault', JSON.stringify({
+        salt: Array.from(salt),
+        iv: encryptedObj.iv,
+        data: encryptedObj.data
+      }));
+    }
+
+    // ---------- UNLOCK / LOCK ----------
+    async function unlockVault() {
+      const password = masterPasswordInput.value.trim();
+      if (!password) {
+        lockError.textContent = '⚠️ Please enter your master password.';
+        return;
+      }
+
+      const stored = getStoredVault();
+      if (!stored) {
+        // First time – create new vault
+        const salt = generateSalt();
+        const key = await deriveKey(password, salt);
+        const emptyData = [];
+        const encrypted = await encryptData(emptyData, key);
+        storeVault(salt, encrypted);
+        currentKey = key;
+        vaultData = emptyData;
+        lockOverlay.classList.add('hidden');
+        mainContainer.classList.add('visible');
+        renderSaved();
+        refreshPassword();
+        lockError.textContent = '';
+        masterPasswordInput.value = '';
+        return;
+      }
+
+      // Existing vault – try to decrypt
+      try {
+        const salt = new Uint8Array(stored.salt);
+        const key = await deriveKey(password, salt);
+        const encryptedObj = { iv: stored.iv, data: stored.data };
+        const decrypted = await decryptData(encryptedObj, key);
+        currentKey = key;
+        vaultData = decrypted;
+        lockOverlay.classList.add('hidden');
+        mainContainer.classList.add('visible');
+        renderSaved();
+        refreshPassword();
+        lockError.textContent = '';
+        masterPasswordInput.value = '';
+      } catch (e) {
+        lockError.textContent = '❌ Wrong password. Please try again.';
+        masterPasswordInput.value = '';
+        masterPasswordInput.focus();
+      }
+    }
+
+    function lockVault() {
+      currentKey = null;
+      vaultData = [];
+      mainContainer.classList.remove('visible');
+      lockOverlay.classList.remove('hidden');
+      lockTitle.textContent = '🔒 Vault Locked';
+      lockSubtitle.textContent = 'Your encrypted vault is locked. Enter your master password to unlock.';
+      lockError.textContent = '';
+      masterPasswordInput.value = '';
+      masterPasswordInput.focus();
+      // Clear the displayed list
+      document.getElementById('savedContainer').innerHTML = `<div class="empty-msg">Vault is locked.</div>`;
+    }
+
+    // ---------- PERSIST VAULT (encrypt and save) ----------
+    async function persistVault() {
+      if (!currentKey) return;
+      const salt = new Uint8Array(getStoredVault().salt);
+      const encrypted = await encryptData(vaultData, currentKey);
+      storeVault(salt, encrypted);
+    }
 
     // ---------- PASSWORD GENERATOR ----------
     const passwordOutput = document.getElementById('passwordOutput');
@@ -974,7 +1269,7 @@
       }
     });
 
-    // ---------- SAVE & STORAGE ----------
+    // ---------- SAVE & RENDER ----------
     const serviceInput = document.getElementById('serviceInput');
     const usernameInput = document.getElementById('usernameInput');
     const saveBtn = document.getElementById('saveBtn');
@@ -982,15 +1277,23 @@
     const savedContainer = document.getElementById('savedContainer');
     const clearAllBtn = document.getElementById('clearAllBtn');
 
-    let savedPasswords = JSON.parse(localStorage.getItem('savedPasswords')) || [];
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     function renderSaved() {
-      if (savedPasswords.length === 0) {
+      if (!currentKey) {
+        savedContainer.innerHTML = `<div class="empty-msg">Vault is locked.</div>`;
+        return;
+      }
+      if (vaultData.length === 0) {
         savedContainer.innerHTML = `<div class="empty-msg">No accounts saved yet.</div>`;
         return;
       }
       let html = '';
-      savedPasswords.forEach((item, index) => {
+      vaultData.forEach((item, index) => {
         html += `
           <div class="saved-item">
             <span class="site">${escapeHtml(item.site)}</span>
@@ -1010,7 +1313,7 @@
       document.querySelectorAll('.copy-username').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const idx = parseInt(e.target.dataset.index);
-          const username = savedPasswords[idx].username || '';
+          const username = vaultData[idx].username || '';
           if (!username) return;
           navigator.clipboard.writeText(username).then(() => {
             e.target.textContent = '✅';
@@ -1032,7 +1335,7 @@
       document.querySelectorAll('.copy-pass').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const idx = parseInt(e.target.dataset.index);
-          const pass = savedPasswords[idx].password;
+          const pass = vaultData[idx].password;
           navigator.clipboard.writeText(pass).then(() => {
             e.target.textContent = '✅';
             setTimeout(() => { e.target.textContent = '🔑'; }, 1500);
@@ -1051,22 +1354,21 @@
 
       // Delete
       document.querySelectorAll('.del-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
           const idx = parseInt(e.target.dataset.index);
-          savedPasswords.splice(idx, 1);
-          localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+          vaultData.splice(idx, 1);
+          await persistVault();
           renderSaved();
         });
       });
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function savePassword() {
+    async function savePassword() {
+      if (!currentKey) {
+        saveMessage.textContent = '⚠️ Vault is locked. Please unlock first.';
+        saveMessage.style.color = '#fbbf24';
+        return;
+      }
       const site = serviceInput.value.trim();
       const username = usernameInput.value.trim();
       const password = passwordOutput.textContent;
@@ -1080,17 +1382,16 @@
         saveMessage.style.color = '#fbbf24';
         return;
       }
-      // Check if service already exists, update if yes
-      const existing = savedPasswords.findIndex(p => p.site.toLowerCase() === site.toLowerCase());
+      const existing = vaultData.findIndex(p => p.site.toLowerCase() === site.toLowerCase());
       if (existing !== -1) {
-        savedPasswords[existing].username = username;
-        savedPasswords[existing].password = password;
+        vaultData[existing].username = username;
+        vaultData[existing].password = password;
       } else {
-        savedPasswords.push({ site, username, password });
+        vaultData.push({ site, username, password });
       }
-      localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+      await persistVault();
       renderSaved();
-      saveMessage.textContent = '✅ Saved successfully!';
+      saveMessage.textContent = '✅ Saved successfully! (Encrypted)';
       saveMessage.style.color = '#34d399';
       serviceInput.value = '';
       usernameInput.value = '';
@@ -1100,25 +1401,43 @@
     }
 
     saveBtn.addEventListener('click', savePassword);
-
-    // Press Enter on any input to save
     serviceInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') savePassword(); });
     usernameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') savePassword(); });
 
-    clearAllBtn.addEventListener('click', () => {
-      if (confirm('Delete all saved accounts?')) {
-        savedPasswords = [];
-        localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+    clearAllBtn.addEventListener('click', async () => {
+      if (!currentKey) return;
+      if (confirm('Delete all saved accounts? This cannot be undone.')) {
+        vaultData = [];
+        await persistVault();
         renderSaved();
       }
     });
 
-    renderSaved();
+    // Lock button
+    lockVaultBtn.addEventListener('click', lockVault);
 
-    // initial password after intro
+    // ---------- UNLOCK EVENT ----------
+    unlockBtn.addEventListener('click', unlockVault);
+    masterPasswordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') unlockVault();
+    });
+
+    // ---------- CHECK FOR EXISTING VAULT ON LOAD ----------
+    // Show lock overlay immediately, but only after intro finishes
     setTimeout(() => {
-      refreshPassword();
-    }, 3200);
+      const stored = getStoredVault();
+      if (stored) {
+        lockTitle.textContent = '🔒 Unlock Vault';
+        lockSubtitle.textContent = 'Enter your master password to access your encrypted vault.';
+      } else {
+        lockTitle.textContent = '🔑 Create Master Password';
+        lockSubtitle.textContent = 'Set a master password to encrypt your vault. Remember it – it cannot be recovered!';
+      }
+      lockOverlay.classList.remove('hidden');
+      masterPasswordInput.focus();
+    }, 3200); // wait for intro to finish
+
+    
   </script>
 </body>
 </html>
