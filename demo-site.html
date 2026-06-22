@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Generator – Free Tool</title>
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: rgb(70, 15, 226);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* ---------- INTRO OVERLAY ---------- */
+    #introOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #0b1e33, #1e3a5f);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease;
+      color: rgb(187, 66, 66);
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #introOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro-slide {
+      position: absolute;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-slide.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .intro-slide h2 {
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .intro-slide p {
+      font-size: 1.4rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    /* ---------- MAIN CONTAINER ---------- */
+    .container {
+      max-width: 540px;
+      width: 100%;
+      background: rgb(153, 165, 162);
+      padding: 2.5rem 2rem;
+      border-radius: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 6px 12px rgba(0, 0, 0, 0.05);
+      transition: 0.2s;
+      display: none; /* hidden until intro ends */
+    }
+
+    .container.visible {
+      display: block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .subhead {
+      color: #4b5563;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .password-display {
+      background: #f1f5f9;
+      border-radius: 16px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      word-break: break-all;
+    }
+
+    #passwordOutput {
+      font-family: 'Menlo', 'Cascadia Code', monospace;
+      font-size: 1.3rem;
+      letter-spacing: 0.02em;
+      color: #0b1e33;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: 8px;
+      transition: background 0.15s;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .copy-btn:hover {
+      background: #dbeafe;
+    }
+
+    .copy-btn.copied {
+      color: #16a34a;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .option-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .option-row label {
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .option-row input[type="range"] {
+      width: 160px;
+      accent-color: #2563eb;
+    }
+
+    .option-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+
+    .length-value {
+      font-weight: 600;
+      color: #2563eb;
+      min-width: 2.2rem;
+      text-align: right;
+    }
+
+    .strength-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.5rem 0 1.8rem;
+    }
+
+    .strength-bar {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 0.25s, background 0.25s;
+    }
+
+    .strength-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      min-width: 5rem;
+      text-align: right;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 0.2rem;
+    }
+
+    .generate-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .built-for {
+      text-align: center;
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e9edf2;
+    }
+
+    .built-for a {
+      display: inline-block;
+      background: #f1f5f9;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      text-decoration: none;
+      color: #1e293b;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .built-for a:hover {
+      background: #2563eb;
+      color: white;
+    }
+
+    .contact {
+      margin-top: 1.2rem;
+      font-size: 0.9rem;
+      color: #475569;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.3rem 1.2rem;
+    }
+
+    .contact span {
+      background: #f8fafc;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.8rem 1.2rem;
+      }
+      h1 {
+        font-size: 1.7rem;
+      }
+      .option-row input[type="range"] {
+        width: 120px;
+      }
+      .intro-slide h2 {
+        font-size: 2rem;
+      }
+      .intro-slide p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO OVERLAY -->
+  <div id="introOverlay">
+    <div id="slide1" class="intro-slide active">
+      <h2>🚀 Welcome to Digital Heroes</h2>
+      <p>Your free tool is loading…</p>
+    </div>
+    <div id="slide2" class="intro-slide">
+      <h2>✨ This is a demo site</h2>
+      <p>Built for the trial task</p>
+    </div>
+  </div>
+
+  <!-- MAIN TOOL -->
+  <div class="container" id="mainContainer">
+    <h1>🔐 Password Generator</h1>
+    <p class="subhead">Strong, customisable passwords – instantly.</p>
+
+    <div class="password-display">
+      <span id="passwordOutput">Click generate</span>
+      <button class="copy-btn" id="copyBtn" title="Copy to clipboard">
+        <span>📋</span>
+        <span style="font-size:0.8rem; font-weight:500;">Copy</span>
+      </button>
+    </div>
+
+    <div class="options">
+      <div class="option-row">
+        <label for="lengthSlider">Length</label>
+        <div style="display:flex; align-items:center; gap:0.8rem;">
+          <input type="range" id="lengthSlider" min="6" max="40" value="16" />
+          <span class="length-value" id="lengthDisplay">16</span>
+        </div>
+      </div>
+      <div class="option-row">
+        <label for="includeUppercase">A–Z</label>
+        <input type="checkbox" id="includeUppercase" checked />
+      </div>
+      <div class="option-row">
+        <label for="includeNumbers">0–9</label>
+        <input type="checkbox" id="includeNumbers" checked />
+      </div>
+      <div class="option-row">
+        <label for="includeSymbols">!@#$%^&*</label>
+        <input type="checkbox" id="includeSymbols" checked />
+      </div>
+    </div>
+
+    <div class="strength-section">
+      <span style="font-weight:500;">Strength</span>
+      <div class="strength-bar">
+        <div class="strength-fill" id="strengthFill"></div>
+      </div>
+      <span class="strength-label" id="strengthLabel">—</span>
+    </div>
+
+    <button class="generate-btn" id="generateBtn">Generate New Password</button>
+
+    <!-- Mandatory "Built for Digital Heroes" button -->
+    <div class="built-for">
+      <a href="https://digitalheroesco.com" target="_blank">Built for Digital Heroes</a>
+    </div>
+
+    <!-- Your name and email – REPLACE WITH YOUR OWN -->
+    <div class="contact">
+      <span>👤 Yogesh Pandey</span>
+      <span>✉️ ap0383683@gmail.com</span>
+      <span href="www.linkedin.com/in/yogeshpandey2028" >connect via linkedIn</span>
+    </div>
+  </div>
+
+  <script>
+    // ---------- INTRO ANIMATION ----------
+    const overlay = document.getElementById('introOverlay');
+    const slide1 = document.getElementById('slide1');
+    const slide2 = document.getElementById('slide2');
+    const mainContainer = document.getElementById('mainContainer');
+
+    // Show first slide immediately (already active)
+    // After 1.5s, switch to second slide
+    setTimeout(() => {
+      slide1.classList.remove('active');
+      slide2.classList.add('active');
+    }, 1500);
+
+    // After another 1.5s, fade out overlay and show main content
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      mainContainer.classList.add('visible');
+      // Remove overlay from DOM after transition to avoid blocking clicks
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 800);
+    }, 3000);
+
+    // ---------- PASSWORD GENERATOR LOGIC ----------
+    const passwordOutput = document.getElementById('passwordOutput');
+    const lengthSlider = document.getElementById('lengthSlider');
+    const lengthDisplay = document.getElementById('lengthDisplay');
+    const includeUppercase = document.getElementById('includeUppercase');
+    const includeNumbers = document.getElementById('includeNumbers');
+    const includeSymbols = document.getElementById('includeSymbols');
+    const generateBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthLabel = document.getElementById('strengthLabel');
+
+    const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+    const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numberChars = '0123456789';
+    const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+    function generatePassword() {
+      const length = parseInt(lengthSlider.value);
+      let chars = lowerChars;
+      if (includeUppercase.checked) chars += upperChars;
+      if (includeNumbers.checked) chars += numberChars;
+      if (includeSymbols.checked) chars += symbolChars;
+
+      if (chars.length === 0) {
+        passwordOutput.textContent = 'Select at least one type';
+        strengthFill.style.width = '0%';
+        strengthLabel.textContent = '—';
+        return '';
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        password += chars[randomIndex];
+      }
+      return password;
+    }
+
+    function updateStrength(password) {
+      let score = 0;
+      if (password.length >= 12) score += 1;
+      if (password.length >= 16) score += 1;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+      if (/\d/.test(password)) score += 1;
+      if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+
+      let label = 'Weak';
+      let width = 20;
+      let color = '#ef4444';
+
+      if (score >= 5) {
+        label = 'Strong';
+        width = 100;
+        color = '#22c55e';
+      } else if (score >= 4) {
+        label = 'Good';
+        width = 75;
+        color = '#eab308';
+      } else if (score >= 3) {
+        label = 'Fair';
+        width = 50;
+        color = '#f59e0b';
+      } else if (score >= 2) {
+        label = 'Weak';
+        width = 25;
+        color = '#ef4444';
+      } else {
+        label = 'Very weak';
+        width = 10;
+        color = '#dc2626';
+      }
+
+      strengthFill.style.width = width + '%';
+      strengthFill.style.backgroundColor = color;
+      strengthLabel.textContent = label;
+    }
+
+    function refreshPassword() {
+      const newPassword = generatePassword();
+      if (newPassword) {
+        passwordOutput.textContent = newPassword;
+        updateStrength(newPassword);
+      }
+      copyBtn.classList.remove('copied');
+      copyBtn.innerHTML = '<span>📋</span><span style="font-size:0.8rem;font-weight:500;">Copy</span>';
+    }
+
+    generateBtn.addEventListener('click', refreshPassword);
+
+    lengthSlider.addEventListener('input', () => {
+      lengthDisplay.textContent = lengthSlider.value;
+      refreshPassword();
+    });
+
+    [includeUppercase, includeNumbers, includeSymbols].forEach((cb) => {
+      cb.addEventListener('change', refreshPassword);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      const text = passwordOutput.textContent;
+      if (!text || text === 'Click generate' || text === 'Select at least one type') return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = '<span>✅</span><span style="font-size:0.8rem;font-weight:500;">Copied!</span>';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = '<span>📋</span><span style="font-size:0.8rem;font-weight:500;">Copy</span>';
+        }, 2500);
+      } catch {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        copyBtn.classList.add('copied');
+        copyBtn.innerHTML = '<span>✅</span><span style="font-size:0.8rem;font-weight:500;">Copied!</span>';
+        setTimeout(() => {
+          copyBtn.classList.remove('copied');
+          copyBtn.innerHTML = '<span>📋</span><span style="font-size:0.8rem;font-weight:500;">Copy</span>';
+        }, 2500);
+      }
+    });
+
+    // Initial generation (when main container becomes visible)
+    // We call it after the overlay hides, but the script runs before that,
+    // so we delay the first generation until after the intro.
+    setTimeout(() => {
+      refreshPassword();
+    }, 3200);
+  </script>
+</body>
+</html>
