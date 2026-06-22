@@ -211,6 +211,7 @@
     }
 
     .lock-box {
+      position: relative;
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -278,6 +279,96 @@
       font-size: 0.9rem;
       min-height: 1.5rem;
       margin-top: 0.5rem;
+    }
+
+    /* ---- Security Manual Toggle (top right corner) ---- */
+    .lock-info-toggle {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .lock-info-toggle:hover {
+      background: rgba(167, 139, 250, 0.12);
+      border-color: #a78bfa;
+      color: #fff;
+    }
+
+    /* ---- Manual content (inside lock box) ---- */
+    .lock-manual-content {
+      position: relative;
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: none;
+      text-align: left;
+      transition: opacity 0.3s;
+    }
+    .lock-manual-content.open {
+      display: block;
+    }
+    .lock-manual-content h4 {
+      color: #c4b5fd;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+      padding-right: 2rem;
+    }
+    .lock-manual-content p {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.4rem;
+    }
+    .lock-manual-content strong {
+      color: #fbbf24;
+    }
+    .lock-manual-content .warning {
+      color: #f87171;
+      font-weight: 500;
+    }
+    .lock-manual-content ul {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      padding-left: 1.2rem;
+      margin: 0.3rem 0;
+    }
+    .lock-manual-content ul li {
+      margin-bottom: 0.1rem;
+    }
+
+    /* ---- Close button inside manual ---- */
+    .manual-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      padding: 0.05rem 0.5rem;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .manual-close-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #f87171;
+      color: #f87171;
     }
 
     /* ---- Generator Section ---- */
@@ -823,6 +914,18 @@
       .lock-box {
         padding: 1.8rem 1.2rem;
       }
+      .lock-info-toggle {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.6rem;
+        top: 8px;
+        right: 10px;
+      }
+      .manual-close-btn {
+        font-size: 0.8rem;
+        padding: 0.05rem 0.4rem;
+        top: 6px;
+        right: 8px;
+      }
     }
   </style>
 </head>
@@ -847,9 +950,29 @@
   <!-- LOCK / UNLOCK OVERLAY -->
   <div id="lockOverlay">
     <div class="lock-box">
+      <!-- Security Info Toggle (top right corner) -->
+      <button class="lock-info-toggle" id="lockInfoToggle">📖 Security Info</button>
+
       <div class="lock-icon">🔒</div>
       <h2 id="lockTitle">Enter Master Password</h2>
       <p id="lockSubtitle">Your vault is encrypted. Enter the password to unlock.</p>
+
+      <!-- Manual content with close button -->
+      <div class="lock-manual-content" id="lockManualContent">
+        <button class="manual-close-btn" id="manualCloseBtn">✕</button>
+        <h4>🔐 How Your Passwords Are Protected</h4>
+        <p><strong>First‑time setup:</strong> You are prompted to create a <strong>master password</strong> – this is the only key that can unlock your vault. <br>You can choose any password you like – make it strong and memorable.</p>
+        <p>All your saved usernames and passwords are <strong>encrypted</strong> before they are stored in your browser. We use:</p>
+        <ul>
+          <li><strong>AES‑GCM (256‑bit)</strong> – the same encryption standard used by banks and governments.</li>
+          <li><strong>PBKDF2</strong> with 100,000 iterations to derive a secure key from your master password (slows brute‑force attacks).</li>
+          <li>A <strong>unique salt</strong> and <strong>random IV</strong> for every vault, so the same master password never produces the same encrypted output.</li>
+        </ul>
+        <p><strong class="warning">⚠️ CRITICAL WARNING:</strong> Your master password is <em>never stored</em> anywhere – not in your browser, not on any server. <br>If you forget it, <strong>there is no way to recover your data</strong>. The vault will be permanently inaccessible. <br>Please store your master password in a secure place (like a physical notebook or a trusted password manager).</p>
+        <p>💡 <strong>Recommendation:</strong> Use a master password that is at least 12 characters long, includes upper/lowercase letters, numbers, and symbols – and is unique to this vault.</p>
+        <p>🔒 Your data never leaves your device. All encryption and decryption happen locally in your browser using the <strong>Web Crypto API</strong>.</p>
+      </div>
+
       <input type="password" id="masterPasswordInput" placeholder="Enter your master password" />
       <button class="lock-btn" id="unlockBtn">Unlock Vault</button>
       <div class="lock-error" id="lockError"></div>
@@ -964,11 +1087,29 @@
 
     setTimeout(() => {
       overlay.classList.add('hidden');
-      // mainContainer will be shown after unlock
       setTimeout(() => {
         overlay.style.display = 'none';
       }, 900);
     }, 3000);
+
+    // ---------- LOCK SCREEN MANUAL TOGGLE ----------
+    const lockInfoToggle = document.getElementById('lockInfoToggle');
+    const lockManualContent = document.getElementById('lockManualContent');
+    const manualCloseBtn = document.getElementById('manualCloseBtn');
+
+    // Open / close via toggle button
+    lockInfoToggle.addEventListener('click', () => {
+      lockManualContent.classList.toggle('open');
+      lockInfoToggle.textContent = lockManualContent.classList.contains('open')
+        ? '❌ Close Info'
+        : '📖 Security Info';
+    });
+
+    // Close via close button
+    manualCloseBtn.addEventListener('click', () => {
+      lockManualContent.classList.remove('open');
+      lockInfoToggle.textContent = '📖 Security Info';
+    });
 
     // ---------- ENCRYPTION / DECRYPTION ----------
     const lockOverlay = document.getElementById('lockOverlay');
@@ -979,10 +1120,9 @@
     const lockSubtitle = document.getElementById('lockSubtitle');
     const lockVaultBtn = document.getElementById('lockVaultBtn');
 
-    let currentKey = null; // holds the crypto key after unlock
-    let vaultData = []; // decrypted array
+    let currentKey = null;
+    let vaultData = [];
 
-    // Helper: generate salt and IV
     function generateSalt() {
       return crypto.getRandomValues(new Uint8Array(16));
     }
@@ -991,7 +1131,6 @@
       return crypto.getRandomValues(new Uint8Array(12));
     }
 
-    // Derive a key from master password using PBKDF2
     async function deriveKey(masterPassword, salt) {
       const enc = new TextEncoder();
       const keyMaterial = await crypto.subtle.importKey(
@@ -1018,7 +1157,6 @@
       );
     }
 
-    // Encrypt data
     async function encryptData(data, key) {
       const enc = new TextEncoder();
       const iv = generateIV();
@@ -1036,7 +1174,6 @@
       };
     }
 
-    // Decrypt data
     async function decryptData(encryptedObj, key) {
       const iv = new Uint8Array(encryptedObj.iv);
       const data = new Uint8Array(encryptedObj.data);
@@ -1081,7 +1218,6 @@
 
       const stored = getStoredVault();
       if (!stored) {
-        // First time – create new vault
         const salt = generateSalt();
         const key = await deriveKey(password, salt);
         const emptyData = [];
@@ -1098,7 +1234,6 @@
         return;
       }
 
-      // Existing vault – try to decrypt
       try {
         const salt = new Uint8Array(stored.salt);
         const key = await deriveKey(password, salt);
@@ -1129,11 +1264,9 @@
       lockError.textContent = '';
       masterPasswordInput.value = '';
       masterPasswordInput.focus();
-      // Clear the displayed list
       document.getElementById('savedContainer').innerHTML = `<div class="empty-msg">Vault is locked.</div>`;
     }
 
-    // ---------- PERSIST VAULT (encrypt and save) ----------
     async function persistVault() {
       if (!currentKey) return;
       const salt = new Uint8Array(getStoredVault().salt);
@@ -1309,7 +1442,6 @@
       });
       savedContainer.innerHTML = html;
 
-      // Copy username
       document.querySelectorAll('.copy-username').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const idx = parseInt(e.target.dataset.index);
@@ -1331,7 +1463,6 @@
         });
       });
 
-      // Copy password
       document.querySelectorAll('.copy-pass').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const idx = parseInt(e.target.dataset.index);
@@ -1352,7 +1483,6 @@
         });
       });
 
-      // Delete
       document.querySelectorAll('.del-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const idx = parseInt(e.target.dataset.index);
@@ -1413,7 +1543,6 @@
       }
     });
 
-    // Lock button
     lockVaultBtn.addEventListener('click', lockVault);
 
     // ---------- UNLOCK EVENT ----------
@@ -1423,7 +1552,6 @@
     });
 
     // ---------- CHECK FOR EXISTING VAULT ON LOAD ----------
-    // Show lock overlay immediately, but only after intro finishes
     setTimeout(() => {
       const stored = getStoredVault();
       if (stored) {
@@ -1435,9 +1563,7 @@
       }
       lockOverlay.classList.remove('hidden');
       masterPasswordInput.focus();
-    }, 3200); // wait for intro to finish
-
-    
+    }, 3200);
   </script>
 </body>
 </html>
